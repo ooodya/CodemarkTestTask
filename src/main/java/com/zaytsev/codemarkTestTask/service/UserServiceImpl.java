@@ -18,7 +18,7 @@ public class UserServiceImpl implements UserService
 
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<User> findAll()

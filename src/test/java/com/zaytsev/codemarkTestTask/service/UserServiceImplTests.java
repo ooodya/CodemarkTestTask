@@ -13,7 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.zaytsev.codemarkTestTask.domain.User;
 
 @SpringBootTest
-public class UserSeriviceImplTests
+public class UserServiceImplTests
 {
 	@Autowired
 	private UserService userService;
@@ -44,7 +44,7 @@ public class UserSeriviceImplTests
 	}
 	
 	@Test
-	public void find()
+	public void findAllShouldReturnAllUsers()
 	{
 		int userSize = 2;
 		List<User> users = userService.findAll();
