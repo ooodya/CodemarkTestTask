@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +26,11 @@ public class UserServiceImpl implements UserService
 	
 	@Autowired
 	private RoleRepository roleRepository;
+	
+	@Autowired
+	private EntityManager em;
+	
+	private static final String FIND_USER_WITH_ROLE_QUERY = "SELECT u FROM User u JOIN FETCH u.roles r WHERE u.login = :login";
 
 	@Override
 	@Transactional(readOnly = true)
@@ -37,15 +45,21 @@ public class UserServiceImpl implements UserService
 	@Transactional(readOnly = true)
 	public Optional<User> findByLogin(String login)
 	{
-		return userRepository.findByLogin(login);
+		TypedQuery<User> query = em.createQuery(FIND_USER_WITH_ROLE_QUERY, User.class).setParameter("login", login);
+		List<User> users = query.getResultList();
+		if (users.isEmpty())
+		{
+			return Optional.empty();
+		}
+		else
+		{
+			return Optional.of(users.get(0));
+		}
 	}
-
 
 	@Override
 	public User save(User user)
 	{
-		User saved = userRepository.save(user);
-		
 		for (Role role: user.getRoles())
 		{
 			Optional<Role> persistedRole = roleRepository.findByName(role.getName());
@@ -56,7 +70,7 @@ public class UserServiceImpl implements UserService
 			}
 		}
 		
-		return saved;
+		return userRepository.save(user);
 	}
 
 	@Override

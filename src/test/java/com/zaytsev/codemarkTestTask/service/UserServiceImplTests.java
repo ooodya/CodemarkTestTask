@@ -2,6 +2,7 @@ package com.zaytsev.codemarkTestTask.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -80,6 +81,29 @@ public class UserServiceImplTests
 		
 		assertNotNull(foundRole1.getId());
 		assertNotNull(foundRole2.getId());
+		
+		userService.delete(user);
+	}
+	
+	@Test
+    @DisplayName("User is saved with roles")
+	void canBeFounddWithRoles()
+	{
+		Role role1 = new Role("pirat");
+		Role role2 = new Role("MainUser");
+		Set<Role> roles = new HashSet<>();
+		roles.add(role1);
+		roles.add(role2);
+		
+		User user = new User("name", "login", "password");
+		user.setRoles(roles);
+		
+		userService.save(user);
+		User found = userService.findByLogin(user.getLogin()).get();
+		
+		assertNotEquals(0, found.getRoles().size());
+		assertTrue(found.getRoles().contains(role1));
+		assertTrue(found.getRoles().contains(role2));
 		
 		userService.delete(user);
 	}
