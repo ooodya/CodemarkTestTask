@@ -81,16 +81,13 @@ public class UserControllerTests
 	@Test
 	@DisplayName("Saving valid user should return boolean true in json")
 	@SneakyThrows
-	public void savingValidUserShouldReturnAnserOk()
+	public void savingValidUserShouldReturnAnswerOk()
 	{
 		User user = new User("name", "login", "password");
 		//mvc.perform(post(URL_ADD_USER, user)).andExpect(jsonPath("$[0].validationResult", is(true)));
 		
 		final MvcResult mvcResult = mvc.perform(post(URL_ADD_USER, user)).andReturn();
-		final Answer answer = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(),
-				new TypeReference<Answer>()
-				{
-				});
+		final Answer answer = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(), Answer.class);
 		assertEquals(true, answer.isValidationResult());
 	}
 

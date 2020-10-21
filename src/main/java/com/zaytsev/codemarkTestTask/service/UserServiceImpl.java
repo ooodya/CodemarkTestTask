@@ -26,12 +26,7 @@ public class UserServiceImpl implements UserService
 	
 	@Autowired
 	private RoleRepository roleRepository;
-	
-	@Autowired
-	private EntityManager em;
-	
-	private static final String FIND_USER_WITH_ROLE_QUERY = "SELECT u FROM User u JOIN FETCH u.roles r WHERE u.login = :login";
-
+		
 	@Override
 	@Transactional(readOnly = true)
 	public List<User> findAll()
@@ -45,16 +40,13 @@ public class UserServiceImpl implements UserService
 	@Transactional(readOnly = true)
 	public Optional<User> findByLogin(String login)
 	{
-		TypedQuery<User> query = em.createQuery(FIND_USER_WITH_ROLE_QUERY, User.class).setParameter("login", login);
-		List<User> users = query.getResultList();
-		if (users.isEmpty())
+		Optional<User> user = userRepository.findByLogin(login);
+		if (!user.isEmpty())
 		{
-			return Optional.empty();
+			user.get().getRoles();
 		}
-		else
-		{
-			return Optional.of(users.get(0));
-		}
+		return user;
+		
 	}
 
 	@Override
