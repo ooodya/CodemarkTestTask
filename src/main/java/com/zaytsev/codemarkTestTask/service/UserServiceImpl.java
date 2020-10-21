@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.zaytsev.codemarkTestTask.domain.Role;
 import com.zaytsev.codemarkTestTask.domain.User;
+import com.zaytsev.codemarkTestTask.repository.RoleRepository;
 import com.zaytsev.codemarkTestTask.repository.UserRepository;
 
 @Service
@@ -18,6 +20,9 @@ public class UserServiceImpl implements UserService
 
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private RoleRepository roleRepository;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -30,15 +35,28 @@ public class UserServiceImpl implements UserService
 
 	@Override
 	@Transactional(readOnly = true)
-	public Optional<User> findById(Long id)
+	public Optional<User> findByLogin(String login)
 	{
-		return userRepository.findById(id);
+		return userRepository.findByLogin(login);
 	}
+
 
 	@Override
 	public User save(User user)
 	{
-		return userRepository.save(user);
+		User saved = userRepository.save(user);
+		
+		for (Role role: user.getRoles())
+		{
+			Optional<Role> persistedRole = roleRepository.findByName(role.getName());
+			
+			if (persistedRole.isEmpty())
+			{
+				roleRepository.save(role);
+			}
+		}
+		
+		return saved;
 	}
 
 	@Override

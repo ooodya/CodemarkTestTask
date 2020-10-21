@@ -34,10 +34,10 @@ public class UserController
 	}
 	
 	@ResponseStatus(HttpStatus.OK)
-	@GetMapping("/{id}")
-	public User findUserById(@PathVariable Long id)
+	@GetMapping("/{login}")
+	public User findUserByLogin(@PathVariable String login)
 	{
-		return userService.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+		return userService.findByLogin(login).orElseThrow(() -> new UserNotFoundException(login));
 	}
 	
 	@ResponseStatus(HttpStatus.CREATED)
@@ -55,10 +55,10 @@ public class UserController
 	}
 	
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	@DeleteMapping("/{id}")
-	public void delete(@PathVariable Long id)
+	@DeleteMapping("/{login}")
+	public void delete(@PathVariable String login)
 	{
-		Optional<User> user = userService.findById(id);
+		Optional<User> user = userService.findByLogin(login);
 		user.ifPresent(userService::delete);
 	}
 }
