@@ -52,11 +52,11 @@ public class UserControllerTests
 
 	private String name1 = "Chelovek";
 	private String login1 = "NeChelovek";
-	private String password1 = "123";
+	private String password1 = "Pass1";
 
 	private String name2 = "Julia";
 	private String login2 = "MelkiyMultic";
-	private String password2 = "456";
+	private String password2 = "Pass2";
 
 	private UserDTO userDTO1 = new UserDTO(name1, login1, password1, new HashSet<RoleDTO>());
 	private UserDTO userDTO2 = new UserDTO(name2, login2, password2, new HashSet<RoleDTO>());

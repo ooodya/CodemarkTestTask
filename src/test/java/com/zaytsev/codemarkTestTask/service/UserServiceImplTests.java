@@ -12,6 +12,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import com.zaytsev.codemarkTestTask.dto.UserDTO;
 import com.zaytsev.codemarkTestTask.repository.RoleRepository;
 
 @SpringBootTest
+@Transactional
 public class UserServiceImplTests
 {
 	@Autowired
@@ -95,9 +98,9 @@ public class UserServiceImplTests
 		userService.save(userDTO);
 
 		UserDTO found = userService.findByLogin(userDTO.getLogin()).get();
-		assertEquals("login", found.getLogin());
-		assertEquals("name", found.getName());
-		assertEquals("password", found.getPassword());
+		assertEquals("login6", found.getLogin());
+		assertEquals("name6", found.getName());
+		assertEquals("password6", found.getPassword());
 
 		userService.delete(userDTO);
 	}
