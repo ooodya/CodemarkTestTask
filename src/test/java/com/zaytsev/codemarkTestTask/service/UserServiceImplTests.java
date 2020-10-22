@@ -17,8 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.zaytsev.codemarkTestTask.domain.Role;
-import com.zaytsev.codemarkTestTask.domain.RoleDTO;
-import com.zaytsev.codemarkTestTask.domain.UserDTO;
+import com.zaytsev.codemarkTestTask.dto.RoleDTO;
+import com.zaytsev.codemarkTestTask.dto.UserDTO;
 import com.zaytsev.codemarkTestTask.repository.RoleRepository;
 
 @SpringBootTest

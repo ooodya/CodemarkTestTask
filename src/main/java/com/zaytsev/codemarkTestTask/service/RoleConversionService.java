@@ -1,9 +1,9 @@
 package com.zaytsev.codemarkTestTask.service;
 
 import com.zaytsev.codemarkTestTask.domain.Role;
-import com.zaytsev.codemarkTestTask.domain.RoleDTO;
+import com.zaytsev.codemarkTestTask.dto.RoleDTO;
 
-public interface RoleToFromDTOConversionService
+public interface RoleConversionService
 {
 	Role convertToRole(RoleDTO roleDTO);
 	

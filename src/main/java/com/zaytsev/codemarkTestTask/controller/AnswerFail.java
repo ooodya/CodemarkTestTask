@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class AnswerFail
 {
 
-	private final boolean validationResult = false;
+	private final boolean success = false;
 	
 	private Set<String> errors = new HashSet<>();
 	

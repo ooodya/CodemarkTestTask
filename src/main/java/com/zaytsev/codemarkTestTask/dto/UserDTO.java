@@ -1,4 +1,4 @@
-package com.zaytsev.codemarkTestTask.domain;
+package com.zaytsev.codemarkTestTask.dto;
 
 import java.util.Set;
 

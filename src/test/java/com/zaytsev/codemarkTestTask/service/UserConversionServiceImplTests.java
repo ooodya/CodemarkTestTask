@@ -9,13 +9,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.zaytsev.codemarkTestTask.domain.Role;
-import com.zaytsev.codemarkTestTask.domain.RoleDTO;
 import com.zaytsev.codemarkTestTask.domain.User;
-import com.zaytsev.codemarkTestTask.domain.UserDTO;
+import com.zaytsev.codemarkTestTask.dto.RoleDTO;
+import com.zaytsev.codemarkTestTask.dto.UserDTO;
 
-public class UserToFromDTOConversionServiceImplTests
+public class UserConversionServiceImplTests
 {
-	private UserToFromDTOConversionServiceImpl userConvService = new UserToFromDTOConversionServiceImpl();
+	private UserConversionServiceImpl userConvService = new UserConversionServiceImpl();
 
 	@Test
 	@DisplayName("User can be converted to UserDTO")

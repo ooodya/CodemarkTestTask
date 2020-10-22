@@ -6,11 +6,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.zaytsev.codemarkTestTask.domain.Role;
-import com.zaytsev.codemarkTestTask.domain.RoleDTO;
+import com.zaytsev.codemarkTestTask.dto.RoleDTO;
 
-public class RoleToFromDTOConversionServiceImplTests
+public class RoleConversionServiceImplTests
 {
-	RoleToFromDTOConversionServiceImpl roleConvService = new RoleToFromDTOConversionServiceImpl();
+	RoleConversionServiceImpl roleConvService = new RoleConversionServiceImpl();
 	
 	@Test
 	@DisplayName("Role can be converted roleDTO")

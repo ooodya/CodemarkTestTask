@@ -3,7 +3,7 @@ package com.zaytsev.codemarkTestTask.service;
 import java.util.List;
 import java.util.Optional;
 
-import com.zaytsev.codemarkTestTask.domain.UserDTO;
+import com.zaytsev.codemarkTestTask.dto.UserDTO;
 
 public interface UserService
 {

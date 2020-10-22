@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.zaytsev.codemarkTestTask.domain.Role;
 import com.zaytsev.codemarkTestTask.domain.User;
-import com.zaytsev.codemarkTestTask.domain.UserDTO;
+import com.zaytsev.codemarkTestTask.dto.UserDTO;
 import com.zaytsev.codemarkTestTask.repository.RoleRepository;
 import com.zaytsev.codemarkTestTask.repository.UserRepository;
 
@@ -25,7 +25,7 @@ public class UserServiceImpl implements UserService
 	private RoleRepository roleRepository;
 	
 	@Autowired
-	private UserToFromDTOConversionService convService;
+	private UserConversionService convService;
 		
 	@Override
 	@Transactional(readOnly = true)

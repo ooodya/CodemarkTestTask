@@ -23,8 +23,8 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zaytsev.codemarkTestTask.domain.RoleDTO;
-import com.zaytsev.codemarkTestTask.domain.UserDTO;
+import com.zaytsev.codemarkTestTask.dto.RoleDTO;
+import com.zaytsev.codemarkTestTask.dto.UserDTO;
 import com.zaytsev.codemarkTestTask.service.UserService;
 
 import lombok.SneakyThrows;
@@ -96,7 +96,7 @@ public class UserControllerTests
 				.content(new ObjectMapper().writeValueAsString(userDTO))).andReturn();
 		final AnswerOk answer = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(),
 				AnswerOk.class);
-		assertEquals(true, answer.isValidationResult());
+		assertEquals(true, answer.isSuccess());
 	}
 
 	@Test

@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class AnswerOk
 {
-	private final boolean validationResult = true;
+	private final boolean success = true;
 }

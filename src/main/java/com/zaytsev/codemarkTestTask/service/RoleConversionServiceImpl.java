@@ -3,10 +3,10 @@ package com.zaytsev.codemarkTestTask.service;
 import org.springframework.stereotype.Service;
 
 import com.zaytsev.codemarkTestTask.domain.Role;
-import com.zaytsev.codemarkTestTask.domain.RoleDTO;
+import com.zaytsev.codemarkTestTask.dto.RoleDTO;
 
 @Service
-public class RoleToFromDTOConversionServiceImpl implements RoleToFromDTOConversionService
+public class RoleConversionServiceImpl implements RoleConversionService
 {
 
 	@Override

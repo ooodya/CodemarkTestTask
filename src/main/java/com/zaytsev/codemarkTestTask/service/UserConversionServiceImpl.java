@@ -10,22 +10,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.zaytsev.codemarkTestTask.domain.Role;
-import com.zaytsev.codemarkTestTask.domain.RoleDTO;
 import com.zaytsev.codemarkTestTask.domain.User;
-import com.zaytsev.codemarkTestTask.domain.UserDTO;
+import com.zaytsev.codemarkTestTask.dto.RoleDTO;
+import com.zaytsev.codemarkTestTask.dto.UserDTO;
 
 @Service
-public class UserToFromDTOConversionServiceImpl implements UserToFromDTOConversionService
+public class UserConversionServiceImpl implements UserConversionService
 {
 	@Autowired
-	private RoleToFromDTOConversionService roleConvService;
+	private RoleConversionService roleConvService;
 	
-	public RoleToFromDTOConversionService getRoleConvService()
+	public RoleConversionService getRoleConvService()
 	{
 		return roleConvService;
 	}
 
-	public void setRoleConvService(RoleToFromDTOConversionService roleConvService)
+	public void setRoleConvService(RoleConversionService roleConvService)
 	{
 		this.roleConvService = roleConvService;
 	}
