@@ -1,5 +1,8 @@
 package com.zaytsev.codemarkTestTask.service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -45,6 +48,17 @@ public class UserToFromDTOConversionServiceImpl implements UserToFromDTOConversi
 		UserDTO userDTO = new UserDTO(user.getName(), user.getLogin(), user.getPassword(), roleDTOs);
 		
 		return userDTO;
+	}
+
+	@Override
+	public List<UserDTO> convertToListOfDTO(List<User> users)
+	{
+		List<UserDTO> userDTOs = new ArrayList<>();
+		for (User user : users)
+		{
+			userDTOs.add(new UserDTO(user.getName(), user.getLogin(), user.getPassword(), new HashSet<>()));
+		}
+		return userDTOs;
 	}
 
 }

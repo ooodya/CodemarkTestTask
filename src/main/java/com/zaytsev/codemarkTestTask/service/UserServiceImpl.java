@@ -3,7 +3,6 @@ package com.zaytsev.codemarkTestTask.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,7 +34,7 @@ public class UserServiceImpl implements UserService
 		List<User> users = new ArrayList<>();
 		userRepository.findAll().forEach(users::add);
 		
-		List<UserDTO> userDTOs = users.stream().map(convService::convertToDTO).collect(Collectors.toList());
+		List<UserDTO> userDTOs = convService.convertToListOfDTO(users);
 		
 		return userDTOs;
 	}
