@@ -17,7 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.zaytsev.codemarkTestTask.domain.Role;
-import com.zaytsev.codemarkTestTask.domain.User;
+import com.zaytsev.codemarkTestTask.domain.RoleDTO;
+import com.zaytsev.codemarkTestTask.domain.UserDTO;
 import com.zaytsev.codemarkTestTask.repository.RoleRepository;
 
 @SpringBootTest
@@ -33,95 +34,113 @@ public class UserServiceImplTests
 	@DisplayName("All users can be found")
 	public void findAllShouldReturnAllUsers()
 	{
-		User user1 = new User("name1", "login1", "password1");
-		User user2 = new User("name2", "login2", "password2");
+		UserDTO userDTO1 = new UserDTO("name1", "login1", "password1", new HashSet<RoleDTO>());
+		UserDTO userDTO2 = new UserDTO("name2", "login2", "password2", new HashSet<RoleDTO>());
 		
-		userService.save(user1);
-		userService.save(user2);
+		userService.save(userDTO1);
+		userService.save(userDTO2);
 		
 		int userSize = 2;
-		List<User> users = userService.findAll();
+		List<UserDTO> usersDTOs = userService.findAll();
 		
-		assertEquals(userSize, users.size());
+		assertEquals(userSize, usersDTOs.size());
 		
-		userService.delete(user1);
-		userService.delete(user2);
+		userService.delete(userDTO1);
+		userService.delete(userDTO2);
+	}
+	
+	@Test
+	@DisplayName("findAll returns users without roles")
+	public void findAllShouldReturnAllUsersWithoutRoles()
+	{
+		Set<RoleDTO> roles = new HashSet<>();
+		roles.add(new RoleDTO("role1"));
+		roles.add(new RoleDTO("role2"));
+		
+		UserDTO userDTO1 = new UserDTO("name1", "login1", "password1", roles);
+		
+		userService.save(userDTO1);
+		
+		List<UserDTO> usersDTOs = userService.findAll();
+		
+		assertEquals(0, usersDTOs.get(0).getRoleDTOs().size());
+		
+		userService.delete(userDTO1);
 	}
 	
 	@Test
     @DisplayName("User can be found")
     void canBeFoundAfterSaved() 
 	{
-        User user = new User("name", "login", "password");
-        User saved = userService.save(user);
-        User found = userService.findByLogin(saved.getLogin()).get();
+		UserDTO userDTO = new UserDTO("name", "login", "password", new HashSet<RoleDTO>());
+        userService.save(userDTO);
+        
+        UserDTO found = userService.findByLogin(userDTO.getLogin()).get();
         assertEquals("login", found.getLogin());
         assertEquals("name", found.getName());
         assertEquals("password", found.getPassword());
         
-        userService.delete(saved);
+        userService.delete(userDTO);
     }
 	
 	@Test
     @DisplayName("User is saved with roles")
 	void canBeSavedWithRoles()
 	{
-		Role role1 = new Role("pirat");
-		Role role2 = new Role("MainUser");
-		Set<Role> roles = new HashSet<>();
-		roles.add(role1);
-		roles.add(role2);
+		RoleDTO roleDTO1 = new RoleDTO("pirat");
+		RoleDTO roleDTO2 = new RoleDTO("MainUser");
+		Set<RoleDTO> roleDTOs = new HashSet<>();
+		roleDTOs.add(roleDTO1);
+		roleDTOs.add(roleDTO2);
 		
-		User user = new User("name", "login", "password");
-		user.setRoles(roles);
-		userService.save(user);
+		UserDTO userDTO = new UserDTO("name", "login", "password", roleDTOs);
+		userService.save(userDTO);
 		
 		Role foundRole1 = roleRepository.findByName("pirat").get();
-		Role foundRole2 = roleRepository.findByName("MainUser").get();
+		Role foundRole2 = roleRepository.findByName("MainUser").get();	
 		
 		assertNotNull(foundRole1.getId());
 		assertNotNull(foundRole2.getId());
 		
-		userService.delete(user);
+		userService.delete(userDTO);
 	}
 	
 	@Test
-    @DisplayName("User is saved with roles")
-	void canBeFounddWithRoles()
+    @DisplayName("User is found with roles")
+	void canBeFoundWithRoles()
 	{
-		Role role1 = new Role("pirat");
-		Role role2 = new Role("MainUser");
-		Set<Role> roles = new HashSet<>();
-		roles.add(role1);
-		roles.add(role2);
+		RoleDTO roleDTO1 = new RoleDTO("pirat");
+		RoleDTO roleDTO2 = new RoleDTO("MainUser");
+		Set<RoleDTO> roleDTOs = new HashSet<>();
+		roleDTOs.add(roleDTO1);
+		roleDTOs.add(roleDTO2);
 		
-		User user = new User("name", "login", "password");
-		user.setRoles(roles);
+		UserDTO userDTO = new UserDTO("name", "login", "password", roleDTOs);
 		
-		userService.save(user);
-		User found = userService.findByLogin(user.getLogin()).get();
+		userService.save(userDTO);
 		
-		assertNotEquals(0, found.getRoles().size());
-		assertTrue(found.getRoles().contains(role1));
-		assertTrue(found.getRoles().contains(role2));
+		UserDTO found = userService.findByLogin(userDTO.getLogin()).get();	
 		
-		userService.delete(user);
+		assertNotEquals(0, found.getRoleDTOs().size());
+		assertTrue(found.getRoleDTOs().contains(roleDTO1));
+		assertTrue(found.getRoleDTOs().contains(roleDTO2));
+		
+		userService.delete(userDTO);
 	}
 	
 	@Test
     @DisplayName("User can be deleted")
 	void canBeDeleted()
 	{
-		User user = new User("name", "login", "password");
-		User saved = userService.save(user);
-		Optional<User> found = userService.findByLogin(saved.getLogin());
+		UserDTO userDTO = new UserDTO("name", "login", "password", new HashSet<RoleDTO>());
+		userService.save(userDTO);
 		
+		Optional<UserDTO> found = userService.findByLogin(userDTO.getLogin());		
 		assertFalse(found.isEmpty());
 		
-		userService.delete(user);
+		userService.delete(userDTO);
 		
-		Optional<User> foundAfterDelete = userService.findByLogin(saved.getLogin());
-		
+		Optional<UserDTO> foundAfterDelete = userService.findByLogin(userDTO.getLogin());		
 		assertTrue(foundAfterDelete.isEmpty());
 	}
 }

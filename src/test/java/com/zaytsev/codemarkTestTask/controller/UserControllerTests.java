@@ -1,12 +1,12 @@
 package com.zaytsev.codemarkTestTask.controller;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.HashSet;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
@@ -16,12 +16,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.MessageSource;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zaytsev.codemarkTestTask.domain.User;
+import com.zaytsev.codemarkTestTask.domain.RoleDTO;
+import com.zaytsev.codemarkTestTask.domain.UserDTO;
 import com.zaytsev.codemarkTestTask.service.UserService;
 
 import lombok.SneakyThrows;
@@ -32,6 +35,7 @@ public class UserControllerTests
 {
 	private static final String URL_GET_ALL_USERS = "http://localhost:8080/user/getall";
 	private static final String URL_ADD_USER = "http://localhost:8080/user/add";
+	private static final String URL_GET_USER_BY_LOGIN = "http://localhost:8080/user/{login}";
 
 	@Autowired
 	private MockMvc mvc;
@@ -39,29 +43,32 @@ public class UserControllerTests
 	@Autowired
 	private UserService userService;
 
-	private String name1 = "Gleb";
-	private String login1 = "Zabor";
+	@Autowired
+	private MessageSource messageSource;
+
+	private String name1 = "Chelovek";
+	private String login1 = "NeChelovek";
 	private String password1 = "123";
 
 	private String name2 = "Julia";
 	private String login2 = "MelkiyMultic";
 	private String password2 = "456";
 
-	private User user1 = new User(name1, login1, password1);
-	private User user2 = new User(name2, login2, password2);
+	private UserDTO userDTO1 = new UserDTO(name1, login1, password1, new HashSet<RoleDTO>());
+	private UserDTO userDTO2 = new UserDTO(name2, login2, password2, new HashSet<RoleDTO>());
 
 	@BeforeEach
 	public void setUp()
 	{
-		userService.save(user1);
-		userService.save(user2);
+		userService.save(userDTO1);
+		userService.save(userDTO2);
 	}
 
 	@AfterEach
 	public void cleanUp()
 	{
-		userService.delete(user1);
-		userService.delete(user2);
+		userService.delete(userDTO1);
+		userService.delete(userDTO2);
 	}
 
 	@Test
@@ -70,25 +77,83 @@ public class UserControllerTests
 	public void testFindAll()
 	{
 		final MvcResult mvcResult = mvc.perform(get(URL_GET_ALL_USERS)).andExpect(status().isOk()).andReturn();
-		final List<User> users = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(),
-				new TypeReference<List<User>>()
+		final List<UserDTO> usersDTOs = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(),
+				new TypeReference<List<UserDTO>>()
 				{
 				});
-		assertEquals(user1, users.get(0));
-		assertEquals(user2, users.get(1));
+		assertEquals(userDTO1, usersDTOs.get(0));
+		assertEquals(userDTO2, usersDTOs.get(1));
 	}
-	
+
 	@Test
 	@DisplayName("Saving valid user should return boolean true in json")
 	@SneakyThrows
 	public void savingValidUserShouldReturnAnswerOk()
 	{
-		User user = new User("name", "login", "password");
-		//mvc.perform(post(URL_ADD_USER, user)).andExpect(jsonPath("$[0].validationResult", is(true)));
-		
-		final MvcResult mvcResult = mvc.perform(post(URL_ADD_USER, user)).andReturn();
-		final Answer answer = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(), Answer.class);
+		UserDTO userDTO = new UserDTO("name", "login", "Password1", new HashSet<RoleDTO>());
+
+		final MvcResult mvcResult = mvc.perform(post(URL_ADD_USER).contentType(MediaType.APPLICATION_JSON)
+				.content(new ObjectMapper().writeValueAsString(userDTO))).andReturn();
+		final AnswerOk answer = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(),
+				AnswerOk.class);
 		assertEquals(true, answer.isValidationResult());
 	}
 
+	@Test
+	@DisplayName("Saving user without name should return correct error message")
+	@SneakyThrows
+	public void savingUserWithoutNameLoginPasswordShouldReturnCorrectErrorMessages()
+	{
+		UserDTO userDTO = new UserDTO("", "", "", new HashSet<RoleDTO>());
+
+		final MvcResult mvcResult = mvc.perform(post(URL_ADD_USER).contentType(MediaType.APPLICATION_JSON)
+				.content(new ObjectMapper().writeValueAsString(userDTO))).andReturn();
+		final AnswerFail answer = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(),
+				AnswerFail.class);
+
+		assertTrue(answer.getErrors().contains(messageSource.getMessage("validation.user.name.empty", null, null)));
+		assertTrue(answer.getErrors().contains(messageSource.getMessage("validation.user.login.empty", null, null)));
+		assertTrue(answer.getErrors().contains(messageSource.getMessage("validation.user.password.empty", null, null)));
+	}
+
+	@Test
+	@DisplayName("Saving user with invalid password should return correct error message")
+	@SneakyThrows
+	public void savingUserWithInvalidPasswordShouldReturnCorrectErrorMessage()
+	{
+		UserDTO userDTO = new UserDTO("name", "login", "asdqwe", new HashSet<RoleDTO>());
+
+		final MvcResult mvcResult = mvc.perform(post(URL_ADD_USER).contentType(MediaType.APPLICATION_JSON)
+				.content(new ObjectMapper().writeValueAsString(userDTO))).andReturn();
+		final AnswerFail answer = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(),
+				AnswerFail.class);
+
+		assertTrue(answer.getErrors()
+				.contains(messageSource.getMessage("validation.user.password.constraints", null, null)));
+	}
+	
+	
+	@Test
+	@DisplayName("Finding excisting user should return correct user")
+	@SneakyThrows
+	public void canFindUser()
+	{
+		final MvcResult mvcResult = mvc.perform(get(URL_GET_USER_BY_LOGIN, login1)).andExpect(status().isOk()).andReturn();
+		final UserDTO userDTO = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(), UserDTO.class);
+		
+		assertEquals(userDTO1, userDTO);
+	}
+	
+	@Test
+	@DisplayName("Finding excisting user with incorrect login should return error message")
+	@SneakyThrows
+	public void cantFindUserWithInvalidLogin()
+	{
+		final String invalidLogin = "adsasdqwewq123123cvbcbcvbcvb";
+				
+		final MvcResult mvcResult = mvc.perform(get(URL_GET_USER_BY_LOGIN, invalidLogin)).andReturn();
+		final AnswerFail answer = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(), AnswerFail.class);
+		
+		assertTrue(answer.getErrors().contains("Could not find user " + invalidLogin));
+	}
 }

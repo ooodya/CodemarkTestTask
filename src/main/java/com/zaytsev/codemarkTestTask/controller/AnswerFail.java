@@ -5,17 +5,16 @@ import java.util.Set;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
-public class Answer
+@NoArgsConstructor
+public class AnswerFail
 {
-	private final boolean validationResult;
+
+	private final boolean validationResult = false;
 	
 	private Set<String> errors = new HashSet<>();
 	
-	public Answer(boolean validationResult)
-	{
-		this.validationResult = validationResult;
-	}
 }

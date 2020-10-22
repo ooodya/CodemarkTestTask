@@ -3,12 +3,12 @@ package com.zaytsev.codemarkTestTask.service;
 import java.util.List;
 import java.util.Optional;
 
-import com.zaytsev.codemarkTestTask.domain.User;
+import com.zaytsev.codemarkTestTask.domain.UserDTO;
 
 public interface UserService
 {
-	List<User> findAll();
-	User save(User user);
-	void delete(User user);
-	Optional<User> findByLogin(String login);
+	List<UserDTO> findAll();
+	void save(UserDTO userDTO);
+	void delete(UserDTO userDTO);
+	Optional<UserDTO> findByLogin(String login);
 }
