@@ -125,6 +125,8 @@ public class UserControllerTests
 		final AnswerOk answer = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(),
 				AnswerOk.class);
 		assertEquals(true, answer.isSuccess());
+		
+		userService.delete(userDTO);
 	}
 	
 	@Test
