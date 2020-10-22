@@ -2,6 +2,7 @@ package com.zaytsev.codemarkTestTask.domain;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -23,6 +24,7 @@ public class Role implements Serializable
 	@GeneratedValue
 	private Long id;
 	
+	@Column(name = "name")
 	private String name;
 	
 	public Role(String name)

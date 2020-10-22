@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -31,12 +32,14 @@ public class User implements Serializable
 	 */
 	private static final long serialVersionUID = 7315727838298231011L;
 
+	@Column(name = "name", nullable = false)
 	private String name;
 
 	@Setter(AccessLevel.NONE)
 	@Id
 	private String login;
 
+	@Column(name = "password", nullable = false)
 	private String password;
 
 	@ManyToMany(cascade = CascadeType.PERSIST)
