@@ -14,25 +14,21 @@ import com.zaytsev.codemarkTestTask.domain.User;
 import com.zaytsev.codemarkTestTask.dto.RoleDTO;
 import com.zaytsev.codemarkTestTask.dto.UserDTO;
 
+import lombok.Data;
+
 @Service
+@Data
 public class UserConversionServiceImpl implements UserConversionService
 {
 	@Autowired
 	private RoleConversionService roleConvService;
 	
-	public RoleConversionService getRoleConvService()
-	{
-		return roleConvService;
-	}
-
-	public void setRoleConvService(RoleConversionService roleConvService)
-	{
-		this.roleConvService = roleConvService;
-	}
-
 	@Override
 	public User convertToUser(UserDTO userDTO)
 	{
+		if (userDTO == null)
+			return null;
+		
 		Set<Role> roles = userDTO.getRoleDTOs().stream().map(roleConvService::convertToRole).collect(Collectors.toSet());
 		
 		User user = new User(userDTO.getName(), userDTO.getLogin(), userDTO.getPassword(), roles);
@@ -43,6 +39,9 @@ public class UserConversionServiceImpl implements UserConversionService
 	@Override
 	public UserDTO convertToDTO(User user)
 	{
+		if (user == null)
+			return null;
+		
 		Set<RoleDTO> roleDTOs = user.getRoles().stream().map(roleConvService::convertToRoleDTO).collect(Collectors.toSet());
 		
 		UserDTO userDTO = new UserDTO(user.getName(), user.getLogin(), user.getPassword(), roleDTOs);
@@ -53,6 +52,11 @@ public class UserConversionServiceImpl implements UserConversionService
 	@Override
 	public List<UserDTO> convertToListOfDTO(List<User> users)
 	{
+		if (users == null)
+		{
+			return new ArrayList<UserDTO>();
+		}
+		
 		List<UserDTO> userDTOs = new ArrayList<>();
 		for (User user : users)
 		{

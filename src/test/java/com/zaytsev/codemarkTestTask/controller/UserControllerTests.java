@@ -4,10 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,6 +38,7 @@ public class UserControllerTests
 {
 	private static final String URL_GET_ALL_USERS = "http://localhost:8080/user/getall";
 	private static final String URL_ADD_USER = "http://localhost:8080/user/add";
+	private static final String URL_UPDATE_USER = "http://localhost:8080/user/update";
 	private static final String URL_GET_USER_BY_LOGIN = "http://localhost:8080/user/{login}";
 
 	@Autowired
@@ -84,6 +88,30 @@ public class UserControllerTests
 		assertEquals(userDTO1, usersDTOs.get(0));
 		assertEquals(userDTO2, usersDTOs.get(1));
 	}
+	
+	@Test
+	@DisplayName("Finding excisting user should return correct user")
+	@SneakyThrows
+	public void canFindUser()
+	{
+		final MvcResult mvcResult = mvc.perform(get(URL_GET_USER_BY_LOGIN, login1)).andExpect(status().isOk())
+				.andReturn();
+		final UserDTO userDTO = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(),
+				UserDTO.class);
+
+		assertEquals(userDTO1, userDTO);
+	}
+
+	@Test
+	@DisplayName("Finding excisting user with incorrect login should return 404")
+	@SneakyThrows
+	public void cantFindUserWithInvalidLogin()
+	{
+		final String invalidLogin = "adsasdqwewq123123cvbcbcvbcvb";
+
+		mvc.perform(get(URL_GET_USER_BY_LOGIN, invalidLogin)).andExpect(status().isNotFound())
+				.andExpect(content().bytes(new byte[0]));
+	}
 
 	@Test
 	@DisplayName("Saving valid user should return boolean true in json")
@@ -93,7 +121,24 @@ public class UserControllerTests
 		UserDTO userDTO = new UserDTO("name", "login", "Password1", new HashSet<RoleDTO>());
 
 		final MvcResult mvcResult = mvc.perform(post(URL_ADD_USER).contentType(MediaType.APPLICATION_JSON)
-				.content(new ObjectMapper().writeValueAsString(userDTO))).andReturn();
+				.content(new ObjectMapper().writeValueAsString(userDTO))).andExpect(status().isCreated()).andReturn();
+		final AnswerOk answer = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(),
+				AnswerOk.class);
+		assertEquals(true, answer.isSuccess());
+	}
+	
+	@Test
+	@DisplayName("Updating user should return boolean true in json")
+	@SneakyThrows
+	public void updatingValidUserShouldReturnAnswerOk() 
+	{
+		Set<RoleDTO> roleDTOs = new HashSet<>();
+		roleDTOs.add(new RoleDTO("role1"));
+		roleDTOs.add(new RoleDTO("role2"));
+		userDTO1.setRoleDTOs(roleDTOs);
+		
+		final MvcResult mvcResult = mvc.perform(put(URL_UPDATE_USER).contentType(MediaType.APPLICATION_JSON)
+				.content(new ObjectMapper().writeValueAsString(userDTO1))).andExpect(status().isOk()).andReturn();
 		final AnswerOk answer = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(),
 				AnswerOk.class);
 		assertEquals(true, answer.isSuccess());
@@ -107,7 +152,7 @@ public class UserControllerTests
 		UserDTO userDTO = new UserDTO("", "", "", new HashSet<RoleDTO>());
 
 		final MvcResult mvcResult = mvc.perform(post(URL_ADD_USER).contentType(MediaType.APPLICATION_JSON)
-				.content(new ObjectMapper().writeValueAsString(userDTO))).andReturn();
+				.content(new ObjectMapper().writeValueAsString(userDTO))).andExpect(status().isBadRequest()).andReturn();
 		final AnswerFail answer = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(),
 				AnswerFail.class);
 
@@ -124,36 +169,12 @@ public class UserControllerTests
 		UserDTO userDTO = new UserDTO("name", "login", "asdqwe", new HashSet<RoleDTO>());
 
 		final MvcResult mvcResult = mvc.perform(post(URL_ADD_USER).contentType(MediaType.APPLICATION_JSON)
-				.content(new ObjectMapper().writeValueAsString(userDTO))).andReturn();
+				.content(new ObjectMapper().writeValueAsString(userDTO))).andExpect(status().isBadRequest()).andReturn();
 		final AnswerFail answer = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(),
 				AnswerFail.class);
 
 		assertTrue(answer.getErrors()
 				.contains(messageSource.getMessage("validation.user.password.constraints", null, null)));
 	}
-	
-	
-	@Test
-	@DisplayName("Finding excisting user should return correct user")
-	@SneakyThrows
-	public void canFindUser()
-	{
-		final MvcResult mvcResult = mvc.perform(get(URL_GET_USER_BY_LOGIN, login1)).andExpect(status().isOk()).andReturn();
-		final UserDTO userDTO = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(), UserDTO.class);
-		
-		assertEquals(userDTO1, userDTO);
-	}
-	
-	@Test
-	@DisplayName("Finding excisting user with incorrect login should return error message")
-	@SneakyThrows
-	public void cantFindUserWithInvalidLogin()
-	{
-		final String invalidLogin = "adsasdqwewq123123cvbcbcvbcvb";
-				
-		final MvcResult mvcResult = mvc.perform(get(URL_GET_USER_BY_LOGIN, invalidLogin)).andReturn();
-		final AnswerFail answer = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(), AnswerFail.class);
-		
-		assertTrue(answer.getErrors().contains("Could not find user " + invalidLogin));
-	}
+
 }

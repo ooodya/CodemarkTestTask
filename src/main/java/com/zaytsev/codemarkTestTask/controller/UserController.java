@@ -1,6 +1,5 @@
 package com.zaytsev.codemarkTestTask.controller;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -57,7 +56,7 @@ public class UserController
 	}
 	
 	@ResponseStatus(HttpStatus.OK)
-	@PutMapping("/{login}")
+	@PutMapping("/update")
 	public AnswerOk update(@Valid @RequestBody UserDTO userDTO)
 	{
 		userService.save(userDTO);		
@@ -84,13 +83,4 @@ public class UserController
 		return new AnswerFail(errors) ;
 	}
 	
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	@ExceptionHandler(UserNotFoundException.class)
-	public AnswerFail handleUserNotFoundException(UserNotFoundException e)
-	{
-		Set<String> errors = new HashSet<>();
-		errors.add(e.getMessage());
-		
-		return new AnswerFail(errors) ;
-	}
 }
