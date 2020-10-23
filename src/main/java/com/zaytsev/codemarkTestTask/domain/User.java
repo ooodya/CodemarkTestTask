@@ -42,7 +42,7 @@ public class User implements Serializable
 	@Column(name = "password", nullable = false)
 	private String password;
 
-	@ManyToMany(cascade = CascadeType.PERSIST)
+	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinTable(name = "USER_ROLE", joinColumns = @JoinColumn(name = "USER_ID"), inverseJoinColumns = @JoinColumn(name = "ROLE_ID"))
 	@Getter(AccessLevel.NONE)
 	private Set<Role> roles = new HashSet<>();

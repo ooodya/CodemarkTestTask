@@ -22,17 +22,19 @@ public class UserConversionServiceImpl implements UserConversionService
 {
 	@Autowired
 	private RoleConversionService roleConvService;
-	
+
 	@Override
 	public User convertToUser(UserDTO userDTO)
 	{
 		if (userDTO == null)
 			return null;
-		
-		Set<Role> roles = userDTO.getRoleDTOs().stream().map(roleConvService::convertToRole).collect(Collectors.toSet());
-		
+
+		Set<Role> roles = (userDTO.getRoleDTOs() != null)
+				? userDTO.getRoleDTOs().stream().map(roleConvService::convertToRole).collect(Collectors.toSet())
+				: new HashSet<>();
+
 		User user = new User(userDTO.getName(), userDTO.getLogin(), userDTO.getPassword(), roles);
-		
+
 		return user;
 	}
 
@@ -41,11 +43,13 @@ public class UserConversionServiceImpl implements UserConversionService
 	{
 		if (user == null)
 			return null;
-		
-		Set<RoleDTO> roleDTOs = user.getRoles().stream().map(roleConvService::convertToRoleDTO).collect(Collectors.toSet());
-		
+
+		Set<RoleDTO> roleDTOs = (user.getRoles() != null)
+				? user.getRoles().stream().map(roleConvService::convertToRoleDTO).collect(Collectors.toSet())
+				: new HashSet<>();
+
 		UserDTO userDTO = new UserDTO(user.getName(), user.getLogin(), user.getPassword(), roleDTOs);
-		
+
 		return userDTO;
 	}
 
@@ -56,7 +60,7 @@ public class UserConversionServiceImpl implements UserConversionService
 		{
 			return new ArrayList<UserDTO>();
 		}
-		
+
 		List<UserDTO> userDTOs = new ArrayList<>();
 		for (User user : users)
 		{
