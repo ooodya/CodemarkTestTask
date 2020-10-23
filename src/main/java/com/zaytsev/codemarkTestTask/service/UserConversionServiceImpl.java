@@ -45,7 +45,7 @@ public class UserConversionServiceImpl implements UserConversionService
 			return null;
 
 		Set<RoleDTO> roleDTOs = (user.getRoles() != null)
-				? user.getRoles().stream().map(roleConvService::convertToRoleDTO).collect(Collectors.toSet())
+				? user.getRoles().stream().map(roleConvService::convertToDTO).collect(Collectors.toSet())
 				: new HashSet<>();
 
 		UserDTO userDTO = new UserDTO(user.getName(), user.getLogin(), user.getPassword(), roleDTOs);

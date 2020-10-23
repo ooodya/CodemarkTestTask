@@ -18,7 +18,7 @@ public class RoleConversionServiceImpl implements RoleConversionService
 	}
 
 	@Override
-	public RoleDTO convertToRoleDTO(Role role)
+	public RoleDTO convertToDTO(Role role)
 	{
 		if (role == null)
 			return null;

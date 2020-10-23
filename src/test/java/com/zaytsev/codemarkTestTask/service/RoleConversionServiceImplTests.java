@@ -18,8 +18,39 @@ public class RoleConversionServiceImplTests
 	{
 		Role role  = new Role("role1");
 		
-		RoleDTO roleDTO = roleConvService.convertToRoleDTO(role);
+		RoleDTO roleDTO = roleConvService.convertToDTO(role);
 		
 		assertEquals(role.getName(), roleDTO.getName());
 	}
+	
+	@Test
+	@DisplayName("roleDTO can be converted role")
+	public void roleDTOCanBeConvertedToRole()
+	{
+		RoleDTO roleDTO  = new RoleDTO("role1");
+		
+		Role role = roleConvService.convertToRole(roleDTO);
+		
+		assertEquals(roleDTO.getName(), role.getName());
+	}
+	
+	@Test
+	@DisplayName("null RoleDTO returns null")
+	public void nullRoleDTOIsConvertedNull()
+	{
+		Role role = roleConvService.convertToRole(null);
+		
+		assertEquals(null, role);
+	}
+	
+	
+	@Test
+	@DisplayName("null Role returns null")
+	public void nullRoleIsConvertedNull()
+	{
+		RoleDTO roleDTO = roleConvService.convertToDTO(null);
+		
+		assertEquals(null, roleDTO);
+	}
+	
 }

@@ -7,5 +7,5 @@ public interface RoleConversionService
 {
 	Role convertToRole(RoleDTO roleDTO);
 	
-	RoleDTO convertToRoleDTO(Role role);
+	RoleDTO convertToDTO(Role role);
 }

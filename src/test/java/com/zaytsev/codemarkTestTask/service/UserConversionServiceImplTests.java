@@ -1,8 +1,10 @@
 package com.zaytsev.codemarkTestTask.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.DisplayName;
@@ -58,5 +60,58 @@ public class UserConversionServiceImplTests
 		assertEquals(userDTO.getPassword(), user.getPassword());
 
 		assertEquals(userDTO.getRoleDTOs().size(), user.getRoles().size());
+	}
+	
+	@Test
+	@DisplayName("null UserDTO return null)")
+	public void nullUserDTOIsConvertedToNull()
+	{
+		User user = userConvService.convertToUser(null);
+		
+		assertEquals(null, user);
+	}
+	
+	@Test
+	@DisplayName("null User return null)")
+	public void nullUserIsConvertedToNull()
+	{
+		UserDTO userDTO = userConvService.convertToDTO(null);
+		
+		assertEquals(null, userDTO);
+	}
+	
+	@Test
+	@DisplayName("null List of users return empty DTO list)")
+	public void nullUserListReturnsEmptyUserDTOList()
+	{
+		List<UserDTO> userDTOs = userConvService.convertToListOfDTO(null);
+		
+		assertEquals(0, userDTOs.size());
+	}
+	
+	@Test
+	@DisplayName("correct List of users can be converted to list of DTOs)")
+	public void userListCanBeConvertedToUserDTOList()
+	{
+		Set<Role> roles = new HashSet<>();
+		roles.add(new Role("role1"));
+		roles.add(new Role("role2"));
+
+		User user1 = new User("name1", "login1", "password1", roles);
+		User user2 = new User("name2", "login2", "password2", roles);
+		
+		List<UserDTO> userDTOs = userConvService.convertToListOfDTO(List.of(user1, user2));
+		
+		assertEquals(2, userDTOs.size());
+		
+		assertEquals("name1", userDTOs.get(0).getName());
+		assertEquals("login1", userDTOs.get(0).getLogin());
+		assertEquals("password1", userDTOs.get(0).getPassword());
+		assertEquals(0, userDTOs.get(0).getRoleDTOs().size());
+		
+		assertEquals("name2", userDTOs.get(1).getName());
+		assertEquals("login2", userDTOs.get(1).getLogin());
+		assertEquals("password2", userDTOs.get(1).getPassword());
+		assertEquals(0, userDTOs.get(1).getRoleDTOs().size());
 	}
 }
