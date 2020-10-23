@@ -12,12 +12,16 @@ public class RoleConversionServiceImpl implements RoleConversionService
 	@Override
 	public Role convertToRole(RoleDTO roleDTO)
 	{
+		if (roleDTO == null)
+			return null;
 		return new Role(roleDTO.getName());
 	}
 
 	@Override
 	public RoleDTO convertToRoleDTO(Role role)
 	{
+		if (role == null)
+			return null;
 		return new RoleDTO(role.getName());
 	}
 
