@@ -64,8 +64,8 @@ public class UserControllerTests
 	@BeforeEach
 	public void setUp()
 	{
-		userService.save(userDTO1);
-		userService.save(userDTO2);
+		userService.add(userDTO1);
+		userService.add(userDTO2);
 	}
 
 	@AfterEach
@@ -88,7 +88,7 @@ public class UserControllerTests
 		assertEquals(userDTO1, usersDTOs.get(0));
 		assertEquals(userDTO2, usersDTOs.get(1));
 	}
-	
+
 	@Test
 	@DisplayName("Finding excisting user should return correct user")
 	@SneakyThrows
@@ -103,7 +103,7 @@ public class UserControllerTests
 	}
 
 	@Test
-	@DisplayName("Finding excisting user with incorrect login should return 404")
+	@DisplayName("Finding user with incorrect login should return 404")
 	@SneakyThrows
 	public void cantFindUserWithInvalidLogin()
 	{
@@ -120,30 +120,46 @@ public class UserControllerTests
 	{
 		UserDTO userDTO = new UserDTO("name", "login", "Password1", new HashSet<RoleDTO>());
 
-		final MvcResult mvcResult = mvc.perform(post(URL_ADD_USER).contentType(MediaType.APPLICATION_JSON)
-				.content(new ObjectMapper().writeValueAsString(userDTO))).andExpect(status().isCreated()).andReturn();
+		final MvcResult mvcResult = mvc
+				.perform(post(URL_ADD_USER).contentType(MediaType.APPLICATION_JSON)
+						.content(new ObjectMapper().writeValueAsString(userDTO)))
+				.andExpect(status().isCreated()).andReturn();
 		final AnswerOk answer = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(),
 				AnswerOk.class);
 		assertEquals(true, answer.isSuccess());
-		
+
 		userService.delete(userDTO);
 	}
-	
+
 	@Test
 	@DisplayName("Updating user should return boolean true in json")
 	@SneakyThrows
-	public void updatingValidUserShouldReturnAnswerOk() 
+	public void updatingValidUserShouldReturnAnswerOk()
 	{
 		Set<RoleDTO> roleDTOs = new HashSet<>();
 		roleDTOs.add(new RoleDTO("role1"));
 		roleDTOs.add(new RoleDTO("role2"));
 		userDTO1.setRoleDTOs(roleDTOs);
-		
-		final MvcResult mvcResult = mvc.perform(put(URL_UPDATE_USER).contentType(MediaType.APPLICATION_JSON)
-				.content(new ObjectMapper().writeValueAsString(userDTO1))).andExpect(status().isOk()).andReturn();
+
+		final MvcResult mvcResult = mvc
+				.perform(put(URL_UPDATE_USER).contentType(MediaType.APPLICATION_JSON)
+						.content(new ObjectMapper().writeValueAsString(userDTO1)))
+				.andExpect(status().isOk()).andReturn();
 		final AnswerOk answer = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(),
 				AnswerOk.class);
 		assertEquals(true, answer.isSuccess());
+	}
+
+	@Test
+	@DisplayName("Updating not existing user should return 404")
+	@SneakyThrows
+	public void updatingUserWithInvalidLoginShouldReturn404()
+	{
+		UserDTO userDTO = new UserDTO("name", "login", "Password1", new HashSet<RoleDTO>());
+
+		mvc.perform(put(URL_UPDATE_USER).contentType(MediaType.APPLICATION_JSON)
+				.content(new ObjectMapper().writeValueAsString(userDTO))).andExpect(status().isNotFound())
+				.andExpect(content().bytes(new byte[0]));
 	}
 
 	@Test
@@ -153,8 +169,10 @@ public class UserControllerTests
 	{
 		UserDTO userDTO = new UserDTO("", "", "", new HashSet<RoleDTO>());
 
-		final MvcResult mvcResult = mvc.perform(post(URL_ADD_USER).contentType(MediaType.APPLICATION_JSON)
-				.content(new ObjectMapper().writeValueAsString(userDTO))).andExpect(status().isBadRequest()).andReturn();
+		final MvcResult mvcResult = mvc
+				.perform(post(URL_ADD_USER).contentType(MediaType.APPLICATION_JSON)
+						.content(new ObjectMapper().writeValueAsString(userDTO)))
+				.andExpect(status().isBadRequest()).andReturn();
 		final AnswerFail answer = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(),
 				AnswerFail.class);
 
@@ -170,13 +188,25 @@ public class UserControllerTests
 	{
 		UserDTO userDTO = new UserDTO("name", "login", "asdqwe", new HashSet<RoleDTO>());
 
-		final MvcResult mvcResult = mvc.perform(post(URL_ADD_USER).contentType(MediaType.APPLICATION_JSON)
-				.content(new ObjectMapper().writeValueAsString(userDTO))).andExpect(status().isBadRequest()).andReturn();
+		final MvcResult mvcResult = mvc
+				.perform(post(URL_ADD_USER).contentType(MediaType.APPLICATION_JSON)
+						.content(new ObjectMapper().writeValueAsString(userDTO)))
+				.andExpect(status().isBadRequest()).andReturn();
 		final AnswerFail answer = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(),
 				AnswerFail.class);
 
 		assertTrue(answer.getErrors()
 				.contains(messageSource.getMessage("validation.user.password.constraints", null, null)));
+	}
+
+	@Test
+	@DisplayName("Saving user with existing login should return 409")
+	@SneakyThrows
+	public void savingUserWithExistingLoginShouldReturn409()
+	{
+		mvc.perform(post(URL_ADD_USER).contentType(MediaType.APPLICATION_JSON)
+				.content(new ObjectMapper().writeValueAsString(userDTO1))).andExpect(status().isConflict())
+				.andExpect(content().bytes(new byte[0]));
 	}
 
 }

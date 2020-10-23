@@ -8,7 +8,8 @@ import com.zaytsev.codemarkTestTask.dto.UserDTO;
 public interface UserService
 {
 	List<UserDTO> findAll();
-	void save(UserDTO userDTO);
 	void delete(UserDTO userDTO);
+	void update(UserDTO userDTO);
+	void add(UserDTO userDTO);
 	Optional<UserDTO> findByLogin(String login);
 }

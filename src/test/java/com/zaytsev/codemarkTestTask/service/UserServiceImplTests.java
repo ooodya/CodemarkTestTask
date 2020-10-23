@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashSet;
@@ -22,6 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.zaytsev.codemarkTestTask.domain.Role;
 import com.zaytsev.codemarkTestTask.dto.RoleDTO;
 import com.zaytsev.codemarkTestTask.dto.UserDTO;
+import com.zaytsev.codemarkTestTask.exceptions.UserAlreadyExists;
 import com.zaytsev.codemarkTestTask.repository.RoleRepository;
 
 @SpringBootTest
@@ -41,8 +43,8 @@ public class UserServiceImplTests
 		UserDTO userDTO1 = new UserDTO("name1", "login1", "password1", new HashSet<RoleDTO>());
 		UserDTO userDTO2 = new UserDTO("name2", "login2", "password2", new HashSet<RoleDTO>());
 
-		userService.save(userDTO1);
-		userService.save(userDTO2);
+		userService.add(userDTO1);
+		userService.add(userDTO2);
 
 		int userSize = 2;
 		List<UserDTO> usersDTOs = userService.findAll();
@@ -52,21 +54,18 @@ public class UserServiceImplTests
 		userService.delete(userDTO1);
 		userService.delete(userDTO2);
 	}
-	
-	@Test
+
+	@Test()
 	@DisplayName("User with existing login is not saved")
 	public void UserWithExistingLoginIsNotSaved()
 	{
 		UserDTO userDTO1 = new UserDTO("name3", "login3", "password3", new HashSet<RoleDTO>());
-		userService.save(userDTO1);
-		
-		UserDTO userDTO2 = new UserDTO("name4", "login3", "password4", new HashSet<RoleDTO>());
-		userService.save(userDTO2);
+		userService.add(userDTO1);
 
-		int userSize = 1;
-		List<UserDTO> usersDTOs = userService.findAll();
-
-		assertEquals(userSize, usersDTOs.size());
+		assertThrows(UserAlreadyExists.class, () ->
+		{
+			userService.add(new UserDTO("name4", "login3", "password4", new HashSet<RoleDTO>()));
+		});
 
 		userService.delete(userDTO1);
 	}
@@ -81,7 +80,7 @@ public class UserServiceImplTests
 
 		UserDTO userDTO1 = new UserDTO("name5", "login5", "password5", roles);
 
-		userService.save(userDTO1);
+		userService.add(userDTO1);
 
 		List<UserDTO> usersDTOs = userService.findAll();
 
@@ -95,7 +94,7 @@ public class UserServiceImplTests
 	void canBeFoundAfterSaved()
 	{
 		UserDTO userDTO = new UserDTO("name6", "login6", "password6", new HashSet<RoleDTO>());
-		userService.save(userDTO);
+		userService.add(userDTO);
 
 		UserDTO found = userService.findByLogin(userDTO.getLogin()).get();
 		assertEquals("login6", found.getLogin());
@@ -116,7 +115,7 @@ public class UserServiceImplTests
 		roleDTOs.add(roleDTO2);
 
 		UserDTO userDTO = new UserDTO("name7", "login7", "password7", roleDTOs);
-		userService.save(userDTO);
+		userService.add(userDTO);
 
 		Role foundRole1 = roleRepository.findByName("pirat").get();
 		Role foundRole2 = roleRepository.findByName("MainUser").get();
@@ -137,30 +136,31 @@ public class UserServiceImplTests
 		roleDTOs.add(roleDTO1);
 		roleDTOs.add(roleDTO2);
 		UserDTO userDTO = new UserDTO("name8", "login8", "password8", roleDTOs);
-		userService.save(userDTO);
-	
+		userService.add(userDTO);
+
 		RoleDTO roleDTO3 = new RoleDTO("newRole");
 		RoleDTO roleDTO4 = new RoleDTO("newRoleToo");
 		Set<RoleDTO> newRoles = new HashSet<>();
 		newRoles.add(roleDTO3);
 		newRoles.add(roleDTO4);
 		UserDTO userDtoForUpdate = new UserDTO("newName", "login", "newPassword", newRoles);
-		userService.save(userDtoForUpdate);
-	
+		userService.add(userDtoForUpdate);
+
 		final Optional<UserDTO> updatedOpt = userService.findByLogin("login");
 		assertTrue(updatedOpt.isPresent());
 		UserDTO updated = updatedOpt.get();
 		assertEquals("login", updated.getLogin());
 		assertEquals("newName", updated.getName());
 		assertEquals("newPassword", updated.getPassword());
-		final Set<String> roleNames = updated.getRoleDTOs().stream().map(role -> role.getName()).collect(Collectors.toSet());
-	
+		final Set<String> roleNames = updated.getRoleDTOs().stream().map(role -> role.getName())
+				.collect(Collectors.toSet());
+
 		assertTrue(roleNames.contains(roleDTO3.getName()));
 		assertTrue(roleNames.contains(roleDTO4.getName()));
-	
+
 		assertFalse(roleNames.contains(roleDTO1.getName()));
 		assertFalse(roleNames.contains(roleDTO2.getName()));
-	
+
 		userService.delete(updated);
 	}
 
@@ -176,7 +176,7 @@ public class UserServiceImplTests
 
 		UserDTO userDTO = new UserDTO("name9", "login9", "password9", roleDTOs);
 
-		userService.save(userDTO);
+		userService.add(userDTO);
 
 		UserDTO found = userService.findByLogin(userDTO.getLogin()).get();
 
@@ -192,7 +192,7 @@ public class UserServiceImplTests
 	void canBeDeleted()
 	{
 		UserDTO userDTO = new UserDTO("name10", "login10", "password10", new HashSet<RoleDTO>());
-		userService.save(userDTO);
+		userService.add(userDTO);
 
 		Optional<UserDTO> found = userService.findByLogin(userDTO.getLogin());
 		assertFalse(found.isEmpty());

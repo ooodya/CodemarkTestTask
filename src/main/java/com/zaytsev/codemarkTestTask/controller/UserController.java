@@ -51,7 +51,7 @@ public class UserController
 	@PostMapping("/add")
 	public AnswerOk create(@Valid @RequestBody UserDTO userDTO)
 	{
-		userService.save(userDTO);
+		userService.add(userDTO);
 		return new AnswerOk();
 	}
 	
@@ -59,7 +59,7 @@ public class UserController
 	@PutMapping("/update")
 	public AnswerOk update(@Valid @RequestBody UserDTO userDTO)
 	{
-		userService.save(userDTO);		
+		userService.update(userDTO);		
 		
 		return new AnswerOk();
 	}

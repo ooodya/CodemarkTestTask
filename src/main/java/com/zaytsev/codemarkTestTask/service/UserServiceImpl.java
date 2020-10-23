@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.zaytsev.codemarkTestTask.domain.Role;
 import com.zaytsev.codemarkTestTask.domain.User;
 import com.zaytsev.codemarkTestTask.dto.UserDTO;
+import com.zaytsev.codemarkTestTask.exceptions.UserAlreadyExists;
+import com.zaytsev.codemarkTestTask.exceptions.UserNotFoundException;
 import com.zaytsev.codemarkTestTask.repository.RoleRepository;
 import com.zaytsev.codemarkTestTask.repository.UserRepository;
 
@@ -55,7 +57,36 @@ public class UserServiceImpl implements UserService
 	}
 
 	@Override
-	public void save(UserDTO userDTO)
+	public void delete(UserDTO userDTO)
+	{
+		User user = convService.convertToUser(userDTO);
+		
+		userRepository.delete(user);
+	}
+
+	@Override
+	public void update(UserDTO userDTO)
+	{
+		if (userRepository.findByLogin(userDTO.getLogin()).isEmpty())
+		{
+			throw new UserNotFoundException(userDTO.getLogin());
+		}
+		
+		save(userDTO);
+	}
+
+	@Override
+	public void add(UserDTO userDTO)
+	{
+		if (userRepository.findByLogin(userDTO.getLogin()).isPresent())
+		{
+			throw new UserAlreadyExists(userDTO.getLogin());
+		}
+		
+		save(userDTO);
+	}
+	
+	private void save(UserDTO userDTO)
 	{
 		User user = convService.convertToUser(userDTO);
 		
@@ -70,14 +101,6 @@ public class UserServiceImpl implements UserService
 		}
 		
 		userRepository.save(user);
-	}
-
-	@Override
-	public void delete(UserDTO userDTO)
-	{
-		User user = convService.convertToUser(userDTO);
-		
-		userRepository.delete(user);
 	}
 
 }
