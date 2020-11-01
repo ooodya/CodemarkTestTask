@@ -1,7 +1,6 @@
 package com.zaytsev.codemarkTestTask.controller;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -66,10 +65,9 @@ public class UserController
 	
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@DeleteMapping("/{login}")
-	public void delete(@PathVariable String login)
+	public void delete(@Valid @RequestBody UserDTO userDTO)
 	{
-		Optional<UserDTO> userDTO = userService.findByLogin(login);
-		userDTO.ifPresent(userService::delete);
+		userService.delete(userDTO);
 	}
 	
 	@ResponseStatus(HttpStatus.BAD_REQUEST)

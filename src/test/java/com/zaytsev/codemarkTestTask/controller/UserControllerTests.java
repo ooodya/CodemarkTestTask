@@ -50,16 +50,16 @@ public class UserControllerTests
 	@Autowired
 	private MessageSource messageSource;
 
-	private String name1 = "Chelovek";
-	private String login1 = "NeChelovek";
-	private String password1 = "Pass1";
+	private final String name1 = "Chelovek";
+	private final String login1 = "NeChelovek";
+	private final String password1 = "Pass1";
 
-	private String name2 = "Julia";
-	private String login2 = "MelkiyMultic";
-	private String password2 = "Pass2";
+	private final String name2 = "Julia";
+	private final String login2 = "MelkiyMultic";
+	private final String password2 = "Pass2";
 
-	private UserDTO userDTO1 = new UserDTO(name1, login1, password1, new HashSet<RoleDTO>());
-	private UserDTO userDTO2 = new UserDTO(name2, login2, password2, new HashSet<RoleDTO>());
+	private final UserDTO userDTO1 = new UserDTO(name1, login1, password1, new HashSet<>());
+	private final UserDTO userDTO2 = new UserDTO(name2, login2, password2, new HashSet<>());
 
 	@BeforeEach
 	public void setUp()
@@ -81,10 +81,9 @@ public class UserControllerTests
 	public void testFindAll()
 	{
 		final MvcResult mvcResult = mvc.perform(get(URL_GET_ALL_USERS)).andExpect(status().isOk()).andReturn();
-		final List<UserDTO> usersDTOs = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(),
-				new TypeReference<List<UserDTO>>()
-				{
-				});
+		final List<UserDTO> usersDTOs = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>()
+		{
+		});
 		assertEquals(userDTO1, usersDTOs.get(0));
 		assertEquals(userDTO2, usersDTOs.get(1));
 	}
@@ -118,7 +117,7 @@ public class UserControllerTests
 	@SneakyThrows
 	public void savingValidUserShouldReturnAnswerOk()
 	{
-		UserDTO userDTO = new UserDTO("name", "login", "Password1", new HashSet<RoleDTO>());
+		UserDTO userDTO = new UserDTO("name", "login", "Password1", new HashSet<>());
 
 		final MvcResult mvcResult = mvc
 				.perform(post(URL_ADD_USER).contentType(MediaType.APPLICATION_JSON)
@@ -126,7 +125,7 @@ public class UserControllerTests
 				.andExpect(status().isCreated()).andReturn();
 		final AnswerOk answer = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(),
 				AnswerOk.class);
-		assertEquals(true, answer.isSuccess());
+		assertTrue(answer.isSuccess());
 
 		userService.delete(userDTO);
 	}
@@ -147,7 +146,7 @@ public class UserControllerTests
 				.andExpect(status().isOk()).andReturn();
 		final AnswerOk answer = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(),
 				AnswerOk.class);
-		assertEquals(true, answer.isSuccess());
+		assertTrue(answer.isSuccess());
 	}
 
 	@Test
@@ -155,7 +154,7 @@ public class UserControllerTests
 	@SneakyThrows
 	public void updatingUserWithInvalidLoginShouldReturn404()
 	{
-		UserDTO userDTO = new UserDTO("name", "login", "Password1", new HashSet<RoleDTO>());
+		UserDTO userDTO = new UserDTO("name", "login", "Password1", new HashSet<>());
 
 		mvc.perform(put(URL_UPDATE_USER).contentType(MediaType.APPLICATION_JSON)
 				.content(new ObjectMapper().writeValueAsString(userDTO))).andExpect(status().isNotFound())
@@ -167,7 +166,7 @@ public class UserControllerTests
 	@SneakyThrows
 	public void savingUserWithoutNameLoginPasswordShouldReturnCorrectErrorMessages()
 	{
-		UserDTO userDTO = new UserDTO("", "", "", new HashSet<RoleDTO>());
+		UserDTO userDTO = new UserDTO("", "", "", new HashSet<>());
 
 		final MvcResult mvcResult = mvc
 				.perform(post(URL_ADD_USER).contentType(MediaType.APPLICATION_JSON)
@@ -186,7 +185,7 @@ public class UserControllerTests
 	@SneakyThrows
 	public void savingUserWithInvalidPasswordShouldReturnCorrectErrorMessage()
 	{
-		UserDTO userDTO = new UserDTO("name", "login", "asdqwe", new HashSet<RoleDTO>());
+		UserDTO userDTO = new UserDTO("name", "login", "asdqwe", new HashSet<>());
 
 		final MvcResult mvcResult = mvc
 				.perform(post(URL_ADD_USER).contentType(MediaType.APPLICATION_JSON)

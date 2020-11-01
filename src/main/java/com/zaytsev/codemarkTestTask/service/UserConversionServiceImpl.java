@@ -33,9 +33,7 @@ public class UserConversionServiceImpl implements UserConversionService
 				? userDTO.getRoleDTOs().stream().map(roleConvService::convertToRole).collect(Collectors.toSet())
 				: new HashSet<>();
 
-		User user = new User(userDTO.getName(), userDTO.getLogin(), userDTO.getPassword(), roles);
-
-		return user;
+		return new User(userDTO.getName(), userDTO.getLogin(), userDTO.getPassword(), roles);
 	}
 
 	@Override
@@ -48,9 +46,7 @@ public class UserConversionServiceImpl implements UserConversionService
 				? user.getRoles().stream().map(roleConvService::convertToDTO).collect(Collectors.toSet())
 				: new HashSet<>();
 
-		UserDTO userDTO = new UserDTO(user.getName(), user.getLogin(), user.getPassword(), roleDTOs);
-
-		return userDTO;
+		return new UserDTO(user.getName(), user.getLogin(), user.getPassword(), roleDTOs);
 	}
 
 	@Override
@@ -58,7 +54,7 @@ public class UserConversionServiceImpl implements UserConversionService
 	{
 		if (users == null)
 		{
-			return new ArrayList<UserDTO>();
+			return new ArrayList<>();
 		}
 
 		List<UserDTO> userDTOs = new ArrayList<>();

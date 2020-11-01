@@ -6,6 +6,7 @@ target/
 mvnw
 .mvn/
 /mvnw.cmd
+.idea/
 
 ### STS ###
 .apt_generated
@@ -16,4 +17,4 @@ mvnw
 .springBeans
 .sts4-cache
 
-.idea/
+

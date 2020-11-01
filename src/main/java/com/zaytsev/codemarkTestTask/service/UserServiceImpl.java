@@ -37,10 +37,8 @@ public class UserServiceImpl implements UserService
 	{
 		List<User> users = new ArrayList<>();
 		userRepository.findAll().forEach(users::add);
-		
-		List<UserDTO> userDTOs = convService.convertToListOfDTO(users);
-		
-		return userDTOs;
+
+		return convService.convertToListOfDTO(users);
 	}
 
 	@Override
@@ -48,39 +46,16 @@ public class UserServiceImpl implements UserService
 	public Optional<UserDTO> findByLogin(String login)
 	{
 		Optional<User> user = userRepository.findByLogin(login);
-		if (!user.isEmpty())
-		{
-			user.get().getRoles();
-		}
-		
-		Optional<UserDTO> userDTO = user.map(convService::convertToDTO);
-		
-		return userDTO;
+		user.ifPresent(User::getRoles);
+
+		return user.map(convService::convertToDTO);
 	}
 
 	@Override
 	public void delete(UserDTO userDTO)
 	{
-		User user = convService.convertToUser(userDTO);
-		
-		Set<Role> persistedRoles = new HashSet<>();
-		
-		for (Role role: user.getRoles())
-		{
-			Optional<Role> persistedRole = roleRepository.findByName(role.getName());
-			
-			if (!persistedRole.isEmpty())
-			{
-				persistedRoles.add(persistedRole.get());
-			}
-			else
-			{
-				persistedRoles.add(role);
-			}
-		}
-		
-		user.setRoles(persistedRoles);
-		
+		User user = setPersistedRoles(userDTO);
+
 		userRepository.delete(user);
 	}
 
@@ -108,15 +83,23 @@ public class UserServiceImpl implements UserService
 	
 	private void save(UserDTO userDTO)
 	{
+		User user = setPersistedRoles(userDTO);
+
+		userRepository.save(user);
+		
+	}
+
+	private User setPersistedRoles(UserDTO userDTO)
+	{
 		User user = convService.convertToUser(userDTO);
-		
+
 		Set<Role> persistedRoles = new HashSet<>();
-		
+
 		for (Role role: user.getRoles())
 		{
 			Optional<Role> persistedRole = roleRepository.findByName(role.getName());
-			
-			if (!persistedRole.isEmpty())
+
+			if (persistedRole.isPresent())
 			{
 				persistedRoles.add(persistedRole.get());
 			}
@@ -125,11 +108,10 @@ public class UserServiceImpl implements UserService
 				persistedRoles.add(role);
 			}
 		}
-		
+
 		user.setRoles(persistedRoles);
-		
-		userRepository.save(user);
-		
+
+		return user;
 	}
 
 }

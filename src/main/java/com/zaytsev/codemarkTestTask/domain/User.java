@@ -47,13 +47,6 @@ public class User implements Serializable
 	@Getter(AccessLevel.NONE)
 	private Set<Role> roles = new HashSet<>();
 
-	public User(String name, String login, String password)
-	{
-		this.name = name;
-		this.login = login;
-		this.password = password;
-	}
-	
 	public Set<Role> getRoles()
 	{
 		return Collections.unmodifiableSet(roles);
