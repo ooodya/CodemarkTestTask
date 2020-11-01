@@ -31,7 +31,7 @@ public class UserController
 	@Autowired
 	private UserService userService;
 
-	
+
 	@ResponseStatus(HttpStatus.OK)
 	@GetMapping("/getall")
 	public List<UserDTO> findAll()

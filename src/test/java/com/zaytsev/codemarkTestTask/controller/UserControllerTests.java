@@ -21,6 +21,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.MessageSource;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -34,6 +35,7 @@ import lombok.SneakyThrows;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@WithMockUser("login")
 public class UserControllerTests
 {
 	private static final String URL_GET_ALL_USERS = "http://localhost:8080/user/getall";
